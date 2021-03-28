@@ -7,7 +7,6 @@ import seaborn as sns
 from community import community_louvain
 from memory_profiler import profile
 from time import time
-from sklearn.metrics import normalized_mutual_info_score
 from networkx.generators.community import LFR_benchmark_graph
 
 
@@ -254,27 +253,30 @@ def accuracy_lfr(tau1, tau2, mu, n=300, algo='label prop'):
 # Main
 
 # Ex 1
-# G = generate_cluster_graph(0.5, 0.1, nb_clusters=2, nb_nodes=100)
-# G_nx = nx.from_edgelist(G)
-# nx.draw(G_nx, with_labels=False)
-# plt.show()  # Clearly, when we increase the ratio p/q, we can distinguish the communities, while the closer the ratio is to 1, the harder it becomes
+ex_1 = False
+if ex_1:
+    G = generate_cluster_graph(0.5, 0.1, nb_clusters=4, nb_nodes_c=100)
+    G_nx = nx.from_edgelist(G)
+    nx.draw(G_nx, with_labels=False)
+    plt.show()  
+# Clearly, when we increase the ratio p/q, we can distinguish the communities, while the closer the ratio is to 1, the harder it becomes
 
-# # Ex 2
-# G_adj = convert_edge_to_adjarray(G)
-# t0 = time()
-# labels, nb_it = label_propagation(G_adj)
-# t1 = time()
-# a = plot_detected_communities(G_adj, labels, show_fig=True)
-# print(a)  # nombre de communautés détectées
-# print('Label propagation time :', t1-t0)
+# Ex 2
+ex_2 = False
+if ex_2:
+    G = generate_cluster_graph(0.1, 0.01, nb_clusters=4, nb_nodes_c=100)
+    G_adj = convert_edge_to_adjarray(GG)
+    labels, nb_it = label_propagation(G_adj)
+    plot_detected_communities(G_adj, labels, show_fig=True)
 
 # Ex 3
 
 # Scalability
 scale = False
+# add @profile in line before functions to get the memory usage for each line
 
 if scale:
-    G = generate_cluster_graph(0.15, 0.02, nb_clusters=8, nb_nodes_c=2000)
+    G = generate_cluster_graph(0.15, 0.02, nb_clusters=4, nb_nodes_c=100)
     G_nx = nx.from_edgelist(G)
     print('Number of nodes : ', G_nx.number_of_nodes(), '\nNumber of edges : ', G_nx.number_of_edges())
 
@@ -290,16 +292,15 @@ if scale:
 
 
 # Accuracy
+
 # plot_accuracy(4, 100)
 
 # LFR benchmark
-n=250
-tau1=3
-tau2=1.5
-mu=0.1
-G_nx = LFR_benchmark_graph(n, tau1, tau2, mu, average_degree=5, min_community=20, seed=10)
+n = 250  # Nb of nodes
+tau1 = 3  # Exponent for the power law distribution followed by the node degrees (>1)
+tau2 = 1.5  # Exponent for the power law distribution followed by the community sizes (>1)
+mu = 0.1  # Fraction of intra-community edges incident to each node (in [0,1])
+G_nx = LFR_benchmark_graph(n, tau1, tau2, mu, average_degree=5, min_community=30, seed=10)
 nx.draw(G_nx)
 plt.show()
-
-
 print(accuracy_lfr(tau1, tau2, mu, algo='label prop'))

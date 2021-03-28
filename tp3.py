@@ -27,7 +27,7 @@ def read_file(filename) :
 ############   FONCTIONS PAGERANK
 
 def calculate_dout(lines_file):
-    ''' calcul du degré sortant et initialisation de P_t
+    '''Calcul du degré sortant et initialisation de P_t
     
     --Input--
     lines_files : liste de couple (s,t)
@@ -109,8 +109,6 @@ def matvectorprod(lines_file, P_t, d_out):
     return(P_t_plus_1)
 
 
-
-
 def page_rank(lines_file, t_range , alpha):
     ''' algorithme du page rank
     
@@ -139,15 +137,42 @@ def page_rank(lines_file, t_range , alpha):
     return(P_t)
 
 
-
+def personalized_page_rank(lines_file, t_range , alpha, P0):
+    ''' algorithme du page rank
     
+    --Input--
+    lines_files : liste de couple (s,t)
+    t_range : nombre d'itération
+    alpha : paramètre de la marche aléatoire
+    P0 : personalization dictionary
+
+    --Output--
+    P_t : dictionnaire de taille n contenant la valeur des scores pageranks au temps t_range
+    
+    '''
+    d_out,P_t = calculate_dout(lines_file)
+    for t in range(t_range):
+        print ('itération',t)
+        P_t = matvectorprod(lines_file, P_t, d_out)
+        
+        Sum_P_t = 0
+        for node in P_t.keys():
+            P_t[node] = (1-alpha)*P_t[node] + alpha * P0
+            Sum_P_t += P_t[node]
+
+        for node in P_t.keys():
+            P_t[node] += P0[node](1-Sum_P_t)
+
+    return(P_t)
+
+
 ########## MAIN
 
 ##### LOADING DATA
 
-filename = dir + r'\alr21--dirLinks--enwiki-20071018\alr21--dirLinks--enwiki-20071018.txt')
+filename = dir + r'alr21--dirLinks--enwiki-20071018.txt'
 
-filename_namewiki = dir + r'\alr21--pageNum2Name--enwiki-20071018\alr21--pageNum2Name--enwiki-20071018.txt'
+filename_namewiki = dir + r'alr21--pageNum2Name--enwiki-20071018.txt'
 
 lines_file = read_file(filename)
 
